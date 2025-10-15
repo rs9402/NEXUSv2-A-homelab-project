@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nexus Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-color-dark: #262424;
+      --panel-bg: rgba(38, 36, 36, 0.75);
+      --border-color: rgba(60, 56, 56, 0.4); 
+      --text-color: #ffffff;
+      --heading-color: #f72525; 
+      --link-bg: #f72525; 
+      --link-hover-bg: #e12020; 
+      --shadow-color: rgba(0, 0, 0, 0.8); 
+    }
+
+    body {
+      background: linear-gradient(135deg, var(--bg-color-dark), #1c1a1a); 
+      color: var(--text-color);
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      padding: 30px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    .header {
+      margin-bottom: 25px;
+      text-align: center;
+      width: 100%;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      color: var(--heading-color);
+      margin: 0;
+    }
+
+    #clock {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--text-color);
+      margin-top: 5px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      width: 100%;
+      max-width: 1200px;
+    }
+
+    .panel {
+      background-color: var(--panel-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 4px 12px var(--shadow-color);
+      transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out, backdrop-filter 0.3s;
+      backdrop-filter: blur(8px);
+    }
+
+    .panel:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 12px 24px var(--shadow-color);
+    }
+
+    .panel h2 {
+      margin-top: 0;
+      font-size: 1.4rem;
+      color: var(--heading-color);
+    }
+
+    .links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    
+    .links a {
+      display: inline-block;
+      padding: 10px 18px;
+      background-color: var(--link-bg);
+      color: var(--bg-color-dark);
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: bold;
+      transition: background-color 0.2s, transform 0.1s;
+    }
+
+    .links a:hover {
+      background-color: var(--link-hover-bg);
+      transform: translateY(-2px);
+    }
+
+    details {
+      position: relative;
+      cursor: pointer;
+    }
+    
+    summary {
+      display: inline-block;
+      padding: 10px 18px;
+      background-color: var(--link-bg);
+      color: var(--bg-color-dark);
+      border-radius: 8px;
+      font-weight: bold;
+      transition: background-color 0.2s, transform 0.1s;
+    }
+    summary:hover {
+        background-color: var(--link-hover-bg);
+        transform: translateY(-2px);
+    }
+
+    details summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .dropdown-links {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      background-color: var(--panel-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      box-shadow: 0 4px 8px var(--shadow-color);
+      padding: 5px;
+      z-index: 10;
+      min-width: 150px;
+      backdrop-filter: blur(10px);
+    }
+    
+    details[open] .dropdown-links {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .dropdown-links a {
+      background-color: transparent;
+      padding: 10px;
+      margin: 0;
+      color: var(--text-color);
+      transition: background-color 0.2s;
+    }
+
+    .dropdown-links a:hover {
+      background-color: var(--link-hover-bg); /* Use hover color for dropdown item background */
+      color: var(--bg-color-dark); /* Dark text on hover background */
+      transform: none;
+    }
+
+    /* Weather Panel Specific Styles */
+    #weather-info p {
+      margin: 5px 0;
+    }
+    #weather-info img {
+      filter: drop-shadow(0 0 5px var(--text-color)); /* White shadow for weather icon */
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>Nexus Dashboard</h1>
+    <div id="clock"></div>
+  </div>
+
+  <div class="grid" id="dashboard">
+    <div class="panel">
+        <h2>Weather</h2>
+        <div id="weather-info">
+            <p>Loading weather data...</p>
+        </div>
+    </div>
+  </div>
+
+  <script>
+    function updateClock() {
+      const now = new Date();
+      document.getElementById('clock').innerText = now.toLocaleString();
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+
+    const services = [
+      {name:'Jellyfin', urls:['http://192.168.0.99:8000']},
+      {name:'Grafana & Prometheus', urls:['http://192.168.0.99:3000','http://192.168.0.99:9191']},
+      {name:'CalibreWeb', urls:['http://192.168.0.99:8083']},
+      {name:'Server Control', urls:['http://192.168.0.99:1234']}
+    ];
+
+    const dashboard = document.getElementById('dashboard');
+
+    services.forEach(s => {
+      const panel = document.createElement('div');
+      panel.className = 'panel';
+
+      const h2 = document.createElement('h2');
+      h2.textContent = s.name;
+      panel.appendChild(h2);
+
+      const linksDiv = document.createElement('div');
+      linksDiv.className = 'links';
+
+      if (s.urls.length === 1) {
+        const a = document.createElement('a');
+        a.href = s.urls[0];
+        a.target = '_blank';
+        a.textContent = 'Open';
+        linksDiv.appendChild(a);
+      } else {
+        const det = document.createElement('details');
+        const sum = document.createElement('summary');
+        sum.textContent = 'Open';
+        det.appendChild(sum);
+        
+        const dropdown = document.createElement('div');
+        dropdown.className = 'dropdown-links';
+        
+        s.urls.forEach(u => {
+          const a = document.createElement('a');
+          a.href = u;
+          a.target = '_blank';
+          const urlParts = u.split(':');
+          const port = urlParts[2];
+          a.textContent = 'Port ' + port;
+          dropdown.appendChild(a);
+        });
+        
+        det.appendChild(dropdown);
+        linksDiv.appendChild(det);
+      }
+      
+      panel.appendChild(linksDiv);
+      dashboard.appendChild(panel);
+    });
+
+    // Function to fetch weather data from the new microservice
+    async function fetchWeather() {
+      const weatherPanel = document.getElementById('weather-info');
+      try {
+        const response = await fetch('http://192.168.0.99:5555/weather');
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        
+        // Use the OpenWeatherMap icon
+        const iconUrl = `https://openweathermap.org/img/wn/${data.icon}@2x.png`;
+        
+        // Update the weather panel with new data
+        weatherPanel.innerHTML = `
+          <p style="font-size: 1.5rem; font-weight: bold;">${data.city}</p>
+          <p>
+            <img src="${iconUrl}" alt="Weather Icon" style="vertical-align: middle; margin-right: 10px; width: 64px; height: 64px;">
+            <span style="font-size: 2.5rem; font-weight: bold;">${Math.round(data.temperature)}°C</span>
+          </p>
+          <p>Feels like: ${Math.round(data.feels_like)}°C</p>
+          <p>Conditions: ${data.conditions}</p>
+          <p>Humidity: ${data.humidity}%</p>
+        `;
+      } catch (error) {
+        console.error("Could not fetch weather data:", error);
+        weatherPanel.innerHTML = '<p>Failed to load weather data.</p>';
+      }
+    }
+
+    // Call the function to load weather data on page load
+    fetchWeather();
+  </script>
+</body>
+</html>
