@@ -73,3 +73,10 @@ While Docker with WSL2 provides strong containerization tools for development, i
 ## Notes
 
 This migration marks a transition toward full-stack infrastructure management — combining system administration, networking, and automation under one self-hosted ecosystem. The goal is to create infrastructure that is stable, secure, and transparent while running efficiently on consumer-grade hardware.
+
+Links to applications I run:
+
+- Grafana: https://github.com/grafana/grafana
+- Prometheus: https://github.com/prometheus/prometheus
+- Jellyfin: https://github.com/jellyfin/jellyfin
+- Calibre: https://github.com/kovidgoyal/calibre
