@@ -9,6 +9,7 @@ Network EXtensible Utility Server - RS9402
 ```                                                  
 *Self-hosted home lab infrastructure built on Windows 10 for monitoring and media services.*
 ### Date: October 2025 – Present
+***(THIS REPOSITORY IS TO BE SEEN AS A PORTFOLIO OF WORK ONLY, AND NOT A PACKAGED SERVER ENVIRONMENT)***
 
 
 # Overview
